@@ -1,0 +1,134 @@
+# --- HOME-X ---
+net home-x              <= hm2_7i76e.0.7i76.0.0.input-00-not
+net home-y              <= hm2_7i76e.0.7i76.0.0.input-01-not
+net home-z              <= hm2_7i76e.0.7i76.0.0.input-02-not
+
+# --- Errors, Alarms, E-Stop ---
+net spindle_alarm       <= hm2_7i76e.0.gpio.021.in_not
+net x_alarm             <= hm2_7i76e.0.gpio.024.in_not
+net y_alarm             <= hm2_7i76e.0.gpio.026.in_not
+net z_alarm             <= hm2_7i76e.0.gpio.028.in_not
+net a_alarm             <= hm2_7i76e.0.gpio.030.in_not
+net b_alarm             <= hm2_7i76e.0.gpio.032.in_not
+net physical_limit      <= hm2_7i76e.0.7i76.0.0.input-31-not
+net low_air_pressure    <= hm2_7i76e.0.7i76.0.0.input-08-not
+net e_stop_button       <= hm2_7i76e.0.gpio.025.in
+net mpg_e_stop_button   <= hm2_7i76e.0.7i76.0.0.input-16
+net tool_probe_limit    <= hm2_7i76e.0.7i76.0.0.input-09
+
+net x-is-homed => xy-homed.in0
+net y-is-homed => xy-homed.in1
+net z-is-homed => xy-and-z-homed.in0
+net xy-are-homed xy-homed.out => xy-and-z-homed.in1
+
+net homed-signal xy-and-z-homed.out => not-homed.in 
+net not-homed-signal not-homed.out => phys-limit-and-not-homed.in0
+net physical_limit => phys-limit-and-not-homed.in1
+net machine_limit <= phys-limit-and-not-homed.out
+
+#--- Probing ---
+net tool_probe_touch    <= hm2_7i76e.0.7i76.0.0.input-10-not
+net touch_probe         <= hm2_7i76e.0.7i76.0.0.input-04-not
+
+#--- ATC ---
+net atc_pwd_sensor          <= hm2_7i76e.0.7i76.0.0.input-12-not
+net atc_index_sensor        <= hm2_7i76e.0.7i76.0.0.input-13-not
+net atc_extended            <= hm2_7i76e.0.7i76.0.0.input-14-not
+net atc_retracted           <= hm2_7i76e.0.7i76.0.0.input-15-not
+net atc_forward             => hm2_7i76e.0.7i76.0.0.output-00
+net atc_backward            => hm2_7i76e.0.7i76.0.0.output-01
+net atc_extend_arm          => hm2_7i76e.0.7i76.0.0.output-02
+net atc_retract_arm         => hm2_7i76e.0.7i76.0.0.output-03
+net atc_pwd_actuate         => hm2_7i76e.0.7i76.0.0.output-04
+
+#--- Lighting ---
+net work_light          => hm2_7i76e.0.7i76.0.0.output-05
+net tower_green         => hm2_7i76e.0.7i76.0.0.output-10
+net tower_yellow        => hm2_7i76e.0.7i76.0.0.output-09
+net tower_red           => hm2_7i76e.0.7i76.0.0.output-08
+
+#--- Coolant ---
+net coolant-mist        => hm2_7i76e.0.7i76.0.0.output-11
+net coolant-flood       => hm2_7i76e.0.7i76.0.0.output-12
+
+#--- Reset ---
+net servo_reset         => hm2_7i76e.0.7i76.0.0.output-07   
+
+
+
+
+#******************************
+# connect miscellaneous signals
+#******************************
+
+#  ---HALUI signals---
+
+net axis-select-x  halui.axis.x.select
+net jog-x-pos      halui.axis.x.plus
+net jog-x-neg      halui.axis.x.minus
+net jog-x-analog   halui.axis.x.analog
+net x-is-homed     halui.joint.0.is-homed
+net axis-select-y  halui.axis.y.select
+net jog-y-pos      halui.axis.y.plus
+net jog-y-neg      halui.axis.y.minus
+net jog-y-analog   halui.axis.y.analog
+net y-is-homed     halui.joint.1.is-homed
+net axis-select-z  halui.axis.z.select
+net jog-z-pos      halui.axis.z.plus
+net jog-z-neg      halui.axis.z.minus
+net jog-z-analog   halui.axis.z.analog
+net z-is-homed     halui.joint.2.is-homed
+net jog-selected-pos      halui.axis.selected.plus
+net jog-selected-neg      halui.axis.selected.minus
+net spindle-manual-cw     halui.spindle.0.forward
+net spindle-manual-ccw    halui.spindle.0.reverse
+net spindle-manual-stop   halui.spindle.0.stop
+net machine-is-on         halui.machine.is-on
+net jog-speed             halui.axis.jog-speed
+net MDI-mode              halui.mode.is-mdi
+
+#  ---charge pump signals---
+net estop-out       =>  charge-pump.enable
+net charge-pump     <=  charge-pump.out
+
+#  ---coolant signals---
+
+net coolant-mist      <=  iocontrol.0.coolant-mist
+net coolant-flood     <=  iocontrol.0.coolant-flood
+
+#  ---probe signal---
+
+net touch_probe     =>  motion.probe-input
+
+#  ---motion control signals---
+
+net in-position               <=  motion.in-position
+net machine-is-enabled        <=  motion.motion-enabled
+
+#  ---digital in / out signals (00 - 64 available) ---
+
+net enable-spindle-pin-override-cmd <=  motion.digital-out-00
+net orient-spindle-cmd              <=  motion.digital-out-01
+net atc_pwd_actuate                 <=  motion.digital-out-02
+net atc_extend_arm                  <=  motion.digital-out-03
+net atc_retract_arm                 <=  motion.digital-out-04
+net atc_forward                     <=  motion.digital-out-05
+net atc_backward                    <=  motion.digital-out-06
+
+
+net send-spindle-enable-to-spindle  =>  motion.digital-in-00
+net orient-spindle-complete         =>  motion.digital-in-01
+net atc_pwd_sensor                  =>  motion.digital-in-02
+net atc_extended                    =>  motion.digital-in-03
+net atc_retracted                   =>  motion.digital-in-04
+net atc_index_sensor                =>  motion.digital-in-05
+
+
+#  ---manual tool change signals---
+
+loadusr -W hal_manualtoolchange
+net tool-change-request     iocontrol.0.tool-change       =>  hal_manualtoolchange.change
+net tool-change-confirmed   iocontrol.0.tool-changed      <=  hal_manualtoolchange.changed
+net tool-number             iocontrol.0.tool-prep-number  =>  hal_manualtoolchange.number
+net tool-prepare-loopback   iocontrol.0.tool-prepare      =>  iocontrol.0.tool-prepared
+

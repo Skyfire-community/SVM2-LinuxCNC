@@ -1,0 +1,20 @@
+o<m12> sub
+
+; Move tool carousel CW Parameter P number of steps
+; Without parameter one step CW.
+; Parameter #5170 is used to track the current tool pocket (persistently)
+
+M64 P5
+
+#<slots> = 0
+
+o101 while [#<p> NE #<slots>] ;when the current tool is not yet a command tool
+    M66 P5 L3 Q1
+    M66 P5 L4 Q1
+    #<slots> = [#<slots> + 1]
+o101 endwhile
+M65 P5
+
+o<m12> endsub [1]
+
+M2

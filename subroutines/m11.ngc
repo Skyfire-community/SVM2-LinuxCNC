@@ -1,0 +1,10 @@
+o<m11> sub
+
+; Move tool carousel CCW Parameter P number of steps
+; Without parameter one step CCW.
+; Parameter #5170 is used to track the current tool pocket (persistently)
+(print, o<M11> P#<p>)
+
+o<m11> endsub [1]
+
+M2

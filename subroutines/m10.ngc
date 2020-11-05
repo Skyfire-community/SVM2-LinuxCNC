@@ -1,0 +1,8 @@
+o<m10> sub
+(print, o<M10> P#<p>, steps=#<steps>)
+; Move tool carousel best direction to pocket P
+; Parameter #5170 is used to track the current tool pocket (persistently)
+
+o<m10> endsub [1]
+
+M2

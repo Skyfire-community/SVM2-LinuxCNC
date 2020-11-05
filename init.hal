@@ -1,0 +1,54 @@
+loadrt [KINS]KINEMATICS
+loadrt [EMCMOT]EMCMOT servo_period_nsec=[EMCMOT]SERVO_PERIOD num_joints=[KINS]JOINTS num_dio=64
+loadrt hostmot2
+loadrt hm2_eth board_ip="10.10.10.10" config="num_encoders=10 num_pwmgens=0 num_stepgens=6 sserial_port_0=0000xx" 
+
+setp    hm2_7i76e.0.watchdog.timeout_ns 5000000
+
+loadrt pid names=pid.x,pid.y,pid.z,pid.s
+loadrt abs names=abs.spindle
+loadrt lowpass names=lowpass.spindle
+loadrt scale names=scale.spindle
+loadrt charge_pump
+loadrt near names=n-spindle-at-speed,n-spindle-at-zero-for-disable
+loadrt not names=not-spindle-at-zero-for-disable,not-homed
+loadrt or2 names=spindle-enabled-or-spinning,spindle-enable-or-override-cmd,either-estop-pressed
+loadrt limit2 names=spindle-ramp
+loadrt timedelay names=spindle-enable-delay
+loadrt mux8 names=jogincr
+loadrt and2 names=xy-homed,xy-and-z-homed,phys-limit-and-not-homed
+
+addf charge-pump                            servo-thread
+addf hm2_7i76e.0.read                       servo-thread
+addf motion-command-handler                 servo-thread
+addf motion-controller                      servo-thread
+addf pid.x.do-pid-calcs                     servo-thread
+addf pid.y.do-pid-calcs                     servo-thread
+addf pid.z.do-pid-calcs                     servo-thread
+addf pid.s.do-pid-calcs                     servo-thread
+addf scale.spindle                          servo-thread
+addf abs.spindle                            servo-thread
+addf lowpass.spindle                        servo-thread
+addf hm2_7i76e.0.write                      servo-thread
+addf n-spindle-at-speed                     servo-thread
+addf n-spindle-at-zero-for-disable          servo-thread
+addf spindle-enabled-or-spinning            servo-thread
+addf not-spindle-at-zero-for-disable        servo-thread
+addf not-homed                              servo-thread
+addf spindle-ramp                           servo-thread
+addf spindle-enable-delay                   servo-thread
+addf spindle-enable-or-override-cmd         servo-thread
+addf jogincr                                servo-thread
+addf either-estop-pressed                   servo-thread
+addf xy-homed                               servo-thread
+addf xy-and-z-homed                         servo-thread
+addf phys-limit-and-not-homed               servo-thread
+
+# --- SPINDLE-ENABLE ---
+setp hm2_7i76e.0.gpio.018.invert_output true
+setp hm2_7i76e.0.gpio.020.invert_output true
+setp hm2_7i76e.0.gpio.022.invert_output true
+
+setp hm2_7i76e.0.gpio.018.is_output true
+setp hm2_7i76e.0.gpio.020.is_output true
+setp hm2_7i76e.0.gpio.022.is_output true

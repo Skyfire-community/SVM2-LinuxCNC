@@ -1,0 +1,28 @@
+
+    
+
+    setp jogincr.in1 0.00025
+    setp jogincr.in2 0.0025
+    setp jogincr.in4 0.025
+    net mpgscale1 jogincr.sel0  <=  hm2_7i76e.0.7i76.0.0.input-22
+    net mpgscale2 jogincr.sel1  <=  hm2_7i76e.0.7i76.0.0.input-23
+    net mpgscale3 jogincr.sel2  <=  hm2_7i76e.0.7i76.0.0.input-24
+
+    net pend-scale  <=  jogincr.out
+    net pend-scale  =>  axis.x.jog-scale
+    net pend-scale  =>  axis.y.jog-scale
+    net pend-scale  =>  axis.z.jog-scale
+
+    net mpg-x <= hm2_7i76e.0.7i76.0.0.input-17
+    net mpg-x => axis.x.jog-enable
+    net mpg-y <= hm2_7i76e.0.7i76.0.0.input-18
+    net mpg-y => axis.y.jog-enable
+    net mpg-z <= hm2_7i76e.0.7i76.0.0.input-19
+    net mpg-z => axis.z.jog-enable
+    #net mpg-A joint.3.jog-enable <= hm2_7i76e.0.7i76.0.0.input-20
+    #net mpg-B joint.4.jog-enable <= hm2_7i76e.0.7i76.0.0.input-21
+
+    net pend-counts <= hm2_7i76e.0.encoder.09.count
+    net pend-counts => axis.x.jog-counts
+    net pend-counts => axis.y.jog-counts
+    net pend-counts => axis.z.jog-counts

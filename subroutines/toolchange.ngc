@@ -1,0 +1,7 @@
+o<toolchange> sub
+(print, o<toolchange>)
+
+
+o<toolchange> endsub [1]
+
+M2

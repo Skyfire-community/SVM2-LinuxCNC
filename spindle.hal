@@ -1,0 +1,151 @@
+
+#*******************
+#  SPINDLE
+#*******************
+
+setp   pid.s.Pgain     [SPINDLE_0]P
+setp   pid.s.Igain     [SPINDLE_0]I
+setp   pid.s.Dgain     [SPINDLE_0]D
+setp   pid.s.bias      [SPINDLE_0]BIAS
+setp   pid.s.FF0       [SPINDLE_0]FF0
+setp   pid.s.FF1       [SPINDLE_0]FF1
+setp   pid.s.FF2       [SPINDLE_0]FF2
+setp   pid.s.deadband  [SPINDLE_0]DEADBAND
+setp   pid.s.maxoutput [SPINDLE_0]MAX_OUTPUT
+setp   pid.s.error-previous-target true
+# This setting is to limit bogus stepgen
+# velocity corrections caused by position
+# feedback sample time jitter.
+setp   pid.s.maxerror 0.012700
+
+net spindle-index-enable  <=> pid.s.index-enable
+net spindle-enable        =>  pid.s.enable
+net spindle-vel-cmd-rpm     => pid.s.command
+net spindle-vel-fb-rpm      => pid.s.feedback
+net spindle-output        <=  pid.s.output
+
+# Step Gen signals/setup
+
+setp   hm2_7i76e.0.stepgen.05.dirsetup        [SPINDLE_0]DIRSETUP
+setp   hm2_7i76e.0.stepgen.05.dirhold         [SPINDLE_0]DIRHOLD
+setp   hm2_7i76e.0.stepgen.05.steplen         [SPINDLE_0]STEPLEN
+setp   hm2_7i76e.0.stepgen.05.stepspace       [SPINDLE_0]STEPSPACE
+setp   hm2_7i76e.0.stepgen.05.position-scale  [SPINDLE_0]STEP_SCALE
+setp   hm2_7i76e.0.stepgen.05.step_type        0
+setp   hm2_7i76e.0.stepgen.05.control-type     1
+setp   hm2_7i76e.0.stepgen.05.maxaccel         [SPINDLE_0]MAX_ACCELERATION
+setp   hm2_7i76e.0.stepgen.05.maxvel           [SPINDLE_0]MAX_VELOCITY
+
+#net spindle-vel-cmd-rps     =>  hm2_7i76e.0.stepgen.05.velocity-cmd
+
+# ---Encoder feedback signals/setup---
+
+setp    hm2_7i76e.0.encoder.03.counter-mode 0
+setp    hm2_7i76e.0.encoder.03.filter 1
+setp    hm2_7i76e.0.encoder.03.index-invert 0
+setp    hm2_7i76e.0.encoder.03.index-mask 0
+setp    hm2_7i76e.0.encoder.03.index-mask-invert 0
+setp    hm2_7i76e.0.encoder.03.scale  [SPINDLE_0]ENCODER_SCALE
+
+net spindle-revs             <=   hm2_7i76e.0.encoder.03.position
+net spindle-vel-fb-rps       <=   hm2_7i76e.0.encoder.03.velocity
+net spindle-index-enable     <=>  hm2_7i76e.0.encoder.03.index-enable
+
+# ---setup spindle control signals---
+
+# ---we need to slow down the spindle acceloration to nearly zero for 1/2 a second
+# ---because a hard start is bad for the spindle bearings and creates a knocking sound
+# ---so we use a limit2 here and use the load timeout on it so its only limiting the
+# ---spindle for 1/2 a second
+
+setp spindle-ramp.maxv .2
+setp spindle-enable-delay.on-delay .25
+
+net spindle-enable                          =>  spindle-enable-delay.in
+net set-spindle-ramp-load spindle-ramp.load <=  spindle-enable-delay.out
+net spindle-vel-cmd-rps                     <=  spindle.0.speed-out-rps => spindle-ramp.in
+net spindle-ramped <= spindle-ramp.out      =>  hm2_7i76e.0.stepgen.05.velocity-cmd
+
+# --- signals of commanded speed in various formats for others to use
+net spindle-vel-cmd-rps-abs     <=  spindle.0.speed-out-rps-abs
+net spindle-vel-cmd-rpm         <=  spindle.0.speed-out 
+net spindle-vel-cmd-rpm-abs     <=  spindle.0.speed-out-abs
+
+
+# --- other spindle commanded details
+net spindle-cw                  <=  spindle.0.forward
+net spindle-ccw                 <=  spindle.0.reverse
+net spindle-brake               <=  spindle.0.brake
+net spindle-revs                =>  spindle.0.revs
+net spindle-vel-fb-rps          =>  spindle.0.speed-in
+net spindle-index-enable        <=> spindle.0.index-enable
+net spindle-enable              <=  spindle.0.on
+
+
+# ---Setup spindle at speed signals---
+
+#  Use ACTUAL spindle velocity from spindle encoder
+#  spindle-velocity bounces around so we filter it with lowpass
+#  spindle-velocity is signed so we use absolute component to remove sign
+#  ACTUAL velocity is in RPS not RPM so we scale it.
+
+# --- using 2 "near" functions to detect when the spindle is either at speed, or virtually stopped
+setp n-spindle-at-speed.scale 1.05
+
+# --- when the spindle is under 100 RPM we will let the spindle disable to finish
+# --- otherwise the hard disable causes the spindle to error out
+setp n-spindle-at-zero-for-disable.in1 100
+setp n-spindle-at-zero-for-disable.difference 110
+
+setp scale.spindle.gain 60
+setp lowpass.spindle.gain 1.000000
+
+net spindle-vel-fb-rps                                   => scale.spindle.in
+net spindle-fb-rpm               scale.spindle.out       =>   abs.spindle.in
+net spindle-fb-rpm-abs           abs.spindle.out         =>   lowpass.spindle.in
+net spindle-fb-rpm-abs-filtered  lowpass.spindle.out
+
+# --- get feeding the commanded & actual speeds into the near function for spindle at speed
+net spindle-vel-cmd-rpm-abs => n-spindle-at-speed.in1
+net spindle-fb-rpm-abs-filtered => n-spindle-at-speed.in2
+
+# --- feeding actual spindle speed into near zero test for disabling
+net spindle-fb-rpm-abs-filtered => n-spindle-at-zero-for-disable.in2
+
+# --- send off the spindle at speed signal
+net spindle-ready <= n-spindle-at-speed.out => spindle.0.at-speed
+
+# --- we have to flip the "at zero" signal because we are looking for it to stay
+# --- true for the or2 coming so that the spindle stays enabled
+# --- until the spindle has slowed down enough.
+net spindle-at-zero-for-disable     <= n-spindle-at-zero-for-disable.out
+net spindle-at-zero-for-disable     => not-spindle-at-zero-for-disable.in
+
+net spindle-not-at-zero-for-disable <= not-spindle-at-zero-for-disable.out
+
+# --- now we want the spindle enabled IF its spinning (over 100RPM) OR the enable signel
+# --- is on via an or2.
+net spindle-enable                  => spindle-enabled-or-spinning.in0 
+net spindle-not-at-zero-for-disable => spindle-enabled-or-spinning.in1
+net spindle-should-be-enabled       <= spindle-enabled-or-spinning.out
+
+# --- when we know 
+net spindle-should-be-enabled   =>  hm2_7i76e.0.stepgen.05.enable
+
+# --- spindle enable needs to go to into another or2
+net spindle-should-be-enabled   =>  spindle-enable-or-override-cmd.in0
+
+# --- spindle use step/dir
+net spindle-should-be-enabled   =>  hm2_7i76e.0.gpio.022.out
+
+# --- are we doing an orient?
+ 
+
+net send-spindle-enable-to-spindle   <=  spindle-enable-or-override-cmd.out
+
+net send-spindle-enable-to-spindle   =>  hm2_7i76e.0.gpio.018.out
+
+# --- orient logic (fire orient cmd shortly after )
+net enable-spindle-pin-override-cmd  => spindle-enable-or-override-cmd.in1
+net orient-spindle-cmd              => hm2_7i76e.0.gpio.020.out
+net orient-spindle-complete         <= hm2_7i76e.0.7i76.0.0.input-07-not

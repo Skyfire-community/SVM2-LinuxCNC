@@ -1,0 +1,62 @@
+loadrt estop_latch count=11
+addf estop-latch.0            servo-thread
+addf estop-latch.1            servo-thread
+addf estop-latch.2            servo-thread
+addf estop-latch.3            servo-thread
+addf estop-latch.4            servo-thread
+addf estop-latch.5            servo-thread
+addf estop-latch.6            servo-thread
+addf estop-latch.7            servo-thread
+addf estop-latch.8            servo-thread
+addf estop-latch.9            servo-thread
+addf estop-latch.10           servo-thread
+
+net latch-ok-in => estop-latch.0.ok-in
+net latch0-out <= estop-latch.0.ok-out 
+net latch0-out => estop-latch.1.ok-in
+net latch1-out <= estop-latch.1.ok-out 
+net latch1-out => estop-latch.2.ok-in
+net latch2-out <= estop-latch.2.ok-out 
+net latch2-out => estop-latch.3.ok-in
+net latch3-out <= estop-latch.3.ok-out 
+net latch3-out => estop-latch.4.ok-in
+net latch4-out <= estop-latch.4.ok-out 
+net latch4-out => estop-latch.5.ok-in
+net latch5-out <= estop-latch.5.ok-out 
+net latch5-out => estop-latch.6.ok-in
+net latch6-out <= estop-latch.6.ok-out 
+net latch6-out => estop-latch.7.ok-in
+net latch7-out <= estop-latch.7.ok-out 
+net latch7-out => estop-latch.8.ok-in
+net latch8-out <= estop-latch.8.ok-out 
+net latch8-out => estop-latch.9.ok-in
+net latch9-out <= estop-latch.9.ok-out 
+net latch9-out => estop-latch.10.ok-in
+net latch10-out <= estop-latch.10.ok-out
+
+net latch10-out => iocontrol.0.emc-enable-in
+
+net latch-reset iocontrol.0.user-request-enable 
+net latch-reset => estop-latch.0.reset
+net latch-reset => estop-latch.1.reset
+net latch-reset => estop-latch.2.reset
+net latch-reset => estop-latch.3.reset
+net latch-reset => estop-latch.4.reset
+net latch-reset => estop-latch.5.reset
+net latch-reset => estop-latch.6.reset
+net latch-reset => estop-latch.7.reset
+net latch-reset => estop-latch.8.reset
+net latch-reset => estop-latch.9.reset
+net latch-reset => estop-latch.10.reset
+
+net spindle_alarm       => estop-latch.0.fault-in
+net x_alarm             => estop-latch.1.fault-in
+net y_alarm             => estop-latch.2.fault-in
+net z_alarm             => estop-latch.3.fault-in
+net a_alarm             => estop-latch.4.fault-in
+net b_alarm             => estop-latch.5.fault-in
+#net machine_limit       => estop-latch.6.fault-in
+net low_air_pressure    => estop-latch.7.fault-in
+net e_stop_button       => estop-latch.8.fault-in
+net mpg_e_stop_button   => estop-latch.9.fault-in
+net tool_probe_limit    => estop-latch.10.fault-in
