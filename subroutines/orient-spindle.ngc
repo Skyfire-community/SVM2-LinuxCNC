@@ -1,0 +1,27 @@
+o<orient-spindle> sub
+
+M66 P0 L0
+#<spindle-was-enabled> = #5399
+O<check-spindle> IF [#<spindle-was-enabled> EQ 0]
+    M64 P0
+    G04 P0.25
+O<check-spindle> ENDIF
+M64 P1
+M66 P1 L3 Q5
+#<orient-return> = #5399
+O<check-fail-orient> IF[#<orient-return> LT 1]
+    M65 P1
+    O<110> IF [#<spindle-was-enabled> EQ 0]
+        M65 P0
+    O<110> ENDIF
+    (MSG, orient failed)
+    ; a return value < 0 fails the 
+    O<spindle-was-enabled> return [-1]
+O<check-fail-orient> ENDIF
+O<110> IF [#<spindle-was-enabled> EQ 0]
+    M65 P0
+    G04 P0.25
+O<110> ENDIF
+O<orient-spindle> endsub [1]
+
+m2

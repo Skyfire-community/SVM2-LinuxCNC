@@ -1,4 +1,4 @@
-loadrt message names=msg_machine_limit,msg_e_stop_press,msg_low_air,msg_alarm_spindle,msg_alarm_x,msg_alarm_y,msg_alarm_z,msg_alarm_a,msg_alarm_b,msg_tool_probe_limit messages="Machine Hard Limit Tripped,E-Stop Pressed,Low Air Pressure,Spindle Alarm,X Servo Alarm,Y Servo Alarm,Z Servo Alarm,A Servo Alarm,B Servo Alarm,Tool Probe Limit"
+loadrt message names=msg_machine_limit,msg_e_stop_press,msg_low_air,msg_alarm_spindle,msg_alarm_x,msg_alarm_y,msg_alarm_z,msg_alarm_a,msg_alarm_b messages="Machine Hard Limit Tripped,E-Stop Pressed,Low Air Pressure,Spindle Alarm,X Servo Alarm,Y Servo Alarm,Z Servo Alarm,A Servo Alarm,B Servo Alarm"
 
 addf msg_machine_limit                      servo-thread
 addf msg_e_stop_press                       servo-thread
@@ -9,7 +9,6 @@ addf msg_alarm_y                            servo-thread
 addf msg_alarm_z                            servo-thread
 addf msg_alarm_a                            servo-thread
 addf msg_alarm_b                            servo-thread
-addf msg_tool_probe_limit                   servo-thread
 
 net spindle_alarm       => msg_alarm_spindle.trigger
 net x_alarm             => msg_alarm_x.trigger
@@ -21,6 +20,5 @@ net b_alarm             => msg_alarm_b.trigger
 net low_air_pressure    => msg_low_air.trigger
 net e_stop_button       => either-estop-pressed.in0
 net mpg_e_stop_button   => either-estop-pressed.in1
-net tool_probe_limit    => msg_tool_probe_limit.trigger
 
 net show_e_stop_msg msg_e_stop_press.trigger    <= either-estop-pressed.out

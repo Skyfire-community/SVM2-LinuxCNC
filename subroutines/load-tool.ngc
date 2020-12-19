@@ -1,0 +1,27 @@
+(load-tool.ngc)
+O<load-tool> sub
+
+M66 P0 L0
+#<spindle-was-enabled> = #5399
+O<check-spindle> IF [#<spindle-was-enabled> EQ 0]
+    M64 P0
+    G04 P0.25
+O<check-spindle> endif
+
+G53 G0 Z10 F100
+G04 P0.25
+G53 G0 Z-72.2 F100
+G04 P0.25
+M23
+G04 P0.5
+M22
+
+
+O<check-spindle-reenable> IF [#<spindle-was-enabled> EQ 0]
+    M65 P0
+    G04 P0.25
+O<check-spindle-reenable> ENDIF
+
+O<load-tool> endsub [1]
+
+m2

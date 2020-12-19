@@ -5,6 +5,20 @@ o<m11> sub
 ; Parameter #5170 is used to track the current tool pocket (persistently)
 (print, o<M11> P#<p>)
 
+M64 P6
+
+#<slots> = 0
+
+o101 while [#<p> NE #<slots>] ;when the current tool is not yet a command tool
+    M66 P5 L3 Q1
+    M66 P5 L4 Q1
+    #<slots> = [#<slots> + 1]
+    #5170 = [#5170 - 1]
+o101 endwhile
+M65 P6
+
+o<m12> endsub [1]
+
 o<m11> endsub [1]
 
 M2

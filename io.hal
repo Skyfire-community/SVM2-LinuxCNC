@@ -14,7 +14,6 @@ net physical_limit      <= hm2_7i76e.0.7i76.0.0.input-31-not
 net low_air_pressure    <= hm2_7i76e.0.7i76.0.0.input-08-not
 net e_stop_button       <= hm2_7i76e.0.gpio.025.in
 net mpg_e_stop_button   <= hm2_7i76e.0.7i76.0.0.input-16
-net tool_probe_limit    <= hm2_7i76e.0.7i76.0.0.input-09
 
 net x-is-homed => xy-homed.in0
 net y-is-homed => xy-homed.in1
@@ -27,7 +26,7 @@ net physical_limit => phys-limit-and-not-homed.in1
 net machine_limit <= phys-limit-and-not-homed.out
 
 #--- Probing ---
-net tool_probe_touch    <= hm2_7i76e.0.7i76.0.0.input-10-not
+net tool_probe_touch    <= hm2_7i76e.0.7i76.0.0.input-09
 net touch_probe         <= hm2_7i76e.0.7i76.0.0.input-04-not
 
 #--- ATC ---
@@ -43,6 +42,8 @@ net atc_pwd_actuate         => hm2_7i76e.0.7i76.0.0.output-04
 
 #--- Lighting ---
 net work_light          => hm2_7i76e.0.7i76.0.0.output-05
+sets work_light true
+
 net tower_green         => hm2_7i76e.0.7i76.0.0.output-10
 net tower_yellow        => hm2_7i76e.0.7i76.0.0.output-09
 net tower_red           => hm2_7i76e.0.7i76.0.0.output-08
