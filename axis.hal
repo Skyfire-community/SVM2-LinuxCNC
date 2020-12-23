@@ -48,6 +48,7 @@ setp    hm2_7i76e.0.encoder.02.index-mask 0
 setp    hm2_7i76e.0.encoder.02.index-mask-invert 0
 setp    hm2_7i76e.0.encoder.02.scale  [JOINT_0]ENCODER_SCALE
 
+#net x-pos-fb               <=  hm2_7i76e.0.stepgen.00.position-fb
 net x-pos-fb               <=  hm2_7i76e.0.encoder.02.position
 net x-vel-fb               <=  hm2_7i76e.0.encoder.02.velocity
 net x-pos-fb               =>  joint.0.motor-pos-fb
