@@ -2,15 +2,20 @@ o<m22> sub
 
 ; Move Carousel to the home position - IN
 
-M65 P3; turn off extend air pressure
-M64 P4; turn on retract air pressure
+M66 P4 L0 
+O100 if [#5399 EQ 0]
+   M65 P3; turn off extend air pressure
+   M64 P4; turn on retract air pressure
 
-M66 P4 L4 Q2 ;check the the atc has retracted
-   O130 if [#5399 LT 0]
-      (abort, failed to extend atc) ; abort if the sensor does not activate in 2 seconds
-      M65 P3; turn off retract air pressure
-      M64 P4; turn on extend air pressure
-   O130 endif
+   M66 P4 L4 Q2 ;check the the atc has extended
+      O130 if [#5399 LT 0]
+         M65 P3; turn off retract air pressure
+         M64 P4; turn on extend air pressure
+         (abort, failed to extend atc) ; abort if the sensor does not activate in 2 seconds
+      O130 else
+         #5210 = 1
+      O130 endif
+O100 endif
 
 
 o<m22> endsub [1]

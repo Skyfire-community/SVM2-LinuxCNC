@@ -1,7 +1,34 @@
 o<m10> sub
-(print, o<M10> P#<p>, steps=#<steps>)
 ; Move tool carousel best direction to pocket P
-; Parameter #5170 is used to track the current tool pocket (persistently)
+;Parameter #<_ini[ATC]CURRENT_TOOL_POCKET> is the numbered parameter used to track the current tool pocket (persistently))
+#<current_pocket> = #[#<_ini[ATC]CURRENT_TOOL_POCKET>]
+#<pockets> = #<_ini[ATC]POCKETS>
+#<half_pocket> = [#<pockets>/2]
+O110 if [#5171 NE 1]
+     M13
+O110 endif
+
+
+    #<steps> = [#<p> - #<current_pocket>]
+   
+o1000 if [#<steps> GT #<half_pocket>]
+    #<steps>=[#<steps> - #<pockets>]
+o1000 endif
+
+o1001 if [#<steps> LT [#<half_pocket> * -1] ]
+    #<steps>=[#<steps> + #<pockets>]
+o1001 endif
+
+ (print, o<M10> Current Pocket=#<current_pocket>,half-pockets=#<half_pocket> , P#<p>, steps=#<steps>)
+
+
+o1003 if [#<steps> GT 0]
+    M12 P[#<steps>]
+
+o1003 elseif [#<steps> LT 0]
+    #<steps>=[#<steps> * -1]
+    M11 P[#<steps>]
+o1003 endif
 
 o<m10> endsub [1]
 

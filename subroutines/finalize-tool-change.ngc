@@ -1,0 +1,12 @@
+o<finalize-tool-change> sub
+
+#2001 = 0;flag that we are mid tool change
+O<check-spindle> IF [#2000 EQ 0]
+    M65 P0
+    G04 P0.25
+O<check-spindle> endif
+
+
+o<finalize-tool-change> endsub 
+
+m2

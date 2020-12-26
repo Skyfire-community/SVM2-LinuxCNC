@@ -2,17 +2,20 @@ o<m21> sub
 
 ; Move Carousel to the tool change position - OUT
 
-M65 P4; turn off retract air pressure
-M64 P3; turn on extend air pressure
+M66 P3 L0 
+O100 if [#5399 EQ 0]
+   M65 P4; turn off retract air pressure
+   M64 P3; turn on extend air pressure
 
-M66 P3 L4 Q2 ;check the the atc has extended
-   O130 if [#5399 LT 0]
-      (abort, failed to extend atc) ; abort if the sensor does not activate in 2 seconds
-      M65 P4; turn off extend air pressure
-      M64 P3; turn on retract air pressure
-   O130 endif
-
-
+   M66 P3 L4 Q2 ;check the the atc has extended
+      O130 if [#5399 LT 0]
+         (abort, failed to extend atc) ; abort if the sensor does not activate in 2 seconds
+         M65 P4; turn off extend air pressure
+         M64 P3; turn on retract air pressure
+      O130 else
+         #5210 = 1
+      O130 endif
+O100 endif
 o<m21> endsub [1]
 
 M2

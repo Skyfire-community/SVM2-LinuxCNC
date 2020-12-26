@@ -1,14 +1,14 @@
 o<m23> sub
 
-M65 P2 ; clamp the tool
+M66 P2 L0
+O100 if [#5399 EQ 1] ;check if the clamp is already closed
+   M65 P2 ; clamp the tool
 
-M66 P2 L4 Q2 ;check the unclamped tool sensor 
-   O130 if [#5399 LT 0]
-      (abort, failed to clamp tool) ; abort if the sensor does not deactivate in 2 seconds
-      M64 P2 ; turn pressure back on to release tool again
-   O130 endif
-
-
-o<m23> endsub [1]
-
+   M66 P2 L4 Q0.5 ;check the unclamped tool sensor 
+      O130 if [#5399 LT 0]
+         M64 P2 ; turn pressure back on to release tool again
+         (abort, failed to clamp tool) ; abort if the sensor does not deactivate in 2 seconds
+      O130 endif
+   o<m23> endsub [1]
+O100 endif
 M2

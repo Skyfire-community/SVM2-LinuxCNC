@@ -1,0 +1,20 @@
+o<init-tool-change> sub
+
+O100 if [#<_spindle_on> NE 0]
+    (abort, Spindle must be off before doing a tool change)
+O100 endif
+
+G53 G0 Z-72.2 F100 ;go up to tool removal height
+
+M66 P0 L0
+#2001 = 1;flag that we are mid tool change
+#2000 = #5399 ;record if the spindle was enabled so we can set this state later
+O<check-spindle> IF [#2000 EQ 0]
+    M64 P0
+    G04 P0.25
+O<check-spindle> endif
+O<orient-spindle> call
+
+o<init_tool_change> endsub 
+
+m2

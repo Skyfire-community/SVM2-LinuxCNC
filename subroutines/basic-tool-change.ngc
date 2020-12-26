@@ -1,0 +1,18 @@
+o<basic-tool-change> sub
+
+
+;O<init-tool-change> call ;Initialize the tool change (like setting flags and orienting spindl)
+;G04 P0.25
+
+
+;O<remove-tool> call ;Extend tool changer at current slot and unload tool from spindle
+;G04 P0.25
+;O<load-tool> call ;Pick up new tool at current slot and retract tool changer
+;G04 P0.25
+;O<finalize-tool-change> call
+;G04 P0.25
+
+
+o<basic-tool-change> endsub 
+
+m2

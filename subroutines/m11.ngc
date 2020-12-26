@@ -1,10 +1,9 @@
 o<m11> sub
 
-; Move tool carousel CCW Parameter P number of steps
-; Without parameter one step CCW.
-; Parameter #5170 is used to track the current tool pocket (persistently)
-
-
+; Move tool carousel CW Parameter P number of steps
+; Without parameter one step CW.
+;Parameter #<_ini[ATC]CURRENT_TOOL_POCKET> is the numbered parameter used to track the current tool pocket (persistently))
+#<pockets> = #<_ini[ATC]POCKETS>
 
 O100 if [#5171 NE 1]
       (print, atc not homed, homing)
@@ -18,17 +17,19 @@ O110 else
     (tells the atc widget move 1 step reverse)
 O110 endif
 
-(tells the atc widget how many steps to move and start moving reverse)
-
-(DEBUG, EVAL[vcp.getWidget{"dynatc"}.rotate{#<Steps_to_move>, "cw"}])
-M64 P5
+(DEBUG, EVAL[vcp.getWidget{"dynatc"}.rotate{#<Steps_to_move>, "ccw"}])
+M64 P6
 O120 do
     M66 P5 L3 Q1
     M66 P5 L4 Q1
-   #5170 = [[[#5170+2] MOD 12]-1]    ;Pocket is no.1-12
+   #<current_pocket> = [#[#<_ini[ATC]CURRENT_TOOL_POCKET>] - 1]
+   o10 if [#<current_pocket> EQ 0]
+      #<current_pocket> = #<pockets>
+   o10 endif
+   #[#<_ini[ATC]CURRENT_TOOL_POCKET>] = #<current_pocket>
    #<Steps_to_move> = [#<Steps_to_move>-1]
 O120 while [#<Steps_to_move> GT 0]
-M65 P5
+M65 P6
 
 o<m11> endsub [1]
 
