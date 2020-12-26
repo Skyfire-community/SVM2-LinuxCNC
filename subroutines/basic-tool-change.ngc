@@ -1,18 +1,86 @@
 o<basic-tool-change> sub
 
+#<current_pocket> = #[#<_ini[ATC]CURRENT_TOOL_POCKET>]
+#<tool_range_start> = [#<_ini[ATC]TOOL_RANGE_START> -1]
+#<pockets> = #<_ini[ATC]POCKETS>
+#<current_spindle_tool> = #[#<_ini[ATC]CURRENT_SPINDLE_TOOL>]
 
-;O<init-tool-change> call ;Initialize the tool change (like setting flags and orienting spindl)
-;G04 P0.25
-
-
-;O<remove-tool> call ;Extend tool changer at current slot and unload tool from spindle
-;G04 P0.25
-;O<load-tool> call ;Pick up new tool at current slot and retract tool changer
-;G04 P0.25
-;O<finalize-tool-change> call
-;G04 P0.25
+O<init-tool-change> call ;Initialize the tool change (like setting flags and orienting spindl)
+G04 P0.25
 
 
-o<basic-tool-change> endsub 
+;assign the variables passed by M6 to some parameters
+#100 = #<_selected_tool>
+#110 = #<_current_tool>
+
+(DEBUG, request tool =#100, current tool = #110)
+
+O10 if [#100 EQ #110] ; checks if tool in the spindle is same as requested
+    o<toolchange> endsub [1]
+    M2
+O10 endif
+
+#<next_pocket> = 0 ; assigns 0 to the next pocket for a later check if the tool is found in the carousel
+#<open_pocket> = 0
+
+#15 = [#<pockets>] ;assign test parameter the number of pockets in the carousel
+O100 do
+    #<pocket_to_test> = [#<tool_range_start> + #15]
+    #<tool_in_pocket> = #[#<tool_range_start> + #15]
+    (DEBUG, #<tool_in_pocket>)
+ 	O110 if [#<tool_in_pocket> EQ #100] ; checks all pockets to see if it contains tool number requested as the new tool
+		#<next_pocket> = #15 ; if tool is found in pocket, assigns the next pocket
+        (DEBUG, tool to load = #<next_pocket>)
+	O110 endif
+
+	O115 if [#<tool_in_pocket> EQ 0] ; checks if the pocket is empty, last pocket checked will be the lowest empty pocket number, for putting tool in spindle away.
+		#<open_pocket> = #15
+	O115 endif
+    #15= [#15 - 1]
+O100 while [#15 GT 0]
+
+O120 if [#<next_pocket> EQ 0] ; if tool is not found, aborts and sends a message
+    (msg, tool not in carousel)
+    o<toolchange> endsub [1]
+O120 endif
+
+;now we know which pocket the next tool is sitting in
+;we need to know if we need to put a tool away
+;or if there is not tool in the spindle
+(DEBUG, place tool #110 in #<open_pocket> then get tool #100 from #<next_pocket>)
+O180 IF [#110 GT 0] ; checks if there is a valid tool in the spindle
+    O190 if [#<open_pocket> EQ 0] ;If there is a tool in the spindle, checks if there is an open pocket
+		(abort, carousel is full, cant put away tool in into carousel)
+	O190 endif
+
+	;M10 P[#<open_pocket>] ; move carousel to an open pocket
+    ;O<remove-tool> CALL
+    (DEBUG, EVAL[vcp.getWidget{"dynatc"}.store_tool{#<open_pocket>, #110}])
+	#[#<tool_range_start> +  #<open_pocket>] = #110 ; save tool number in pocket
+	#[#<_ini[ATC]CURRENT_SPINDLE_TOOL>] = 0 ; empty tool in the spindle
+O180 ENDIF
+
+G0 G53 Z0
+
+O200 IF [#100 GT 0] ; selected tool is not tool
+    ;M10 P#<next_pocket> ;set the carousel to move to the right pocket for the selected tool
+    ;O<load-tool> CALL
+    (DEBUG, EVAL[vcp.getWidget{"dynatc"}.store_tool{#<next_pocket>, 0}])
+    #[#<tool_range_start> +  #<next_pocket>] = 0
+    #[#<_ini[ATC]CURRENT_SPINDLE_TOOL>] = #100 ;Set persistent variable to remember tool in spindle after power cycle
+O200 Else
+    ;M22
+O200 ENDIF
+
+M61 Q#100
+
+o<010> if [1 EQ 1]
+  G43 H#100
+o<010> endif
+
+O<finalize-tool-change> call
+G04 P0.25
+
+o<basic-tool-change> endsub [1]
 
 m2

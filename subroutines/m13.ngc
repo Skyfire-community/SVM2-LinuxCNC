@@ -18,11 +18,13 @@ o130 while [#1 LT [#<pockets> + 1]]
     #1 = [#1+1]
     (DEBUG, EVAL[vcp.getWidget{"dynatc"}.store_tool{#1, #2}])
 o130 endwhile
-#5171=1
-#<step_to_current> = [#<current_pocket> - 1];
-(DEBUG, EVAL[vcp.getWidget{"dynatc"}.rotate{#<step_to_current>, "cw"}])
+
+O140 IF [#<current_pocket> NE 1]
+    M10 P1 
+O140 endif
 
 (DEBUG, EVAL[vcp.getWidget{"dynatc"}.atc_message{}])
+#5171=1
 
 o<m13> endsub [1]
 

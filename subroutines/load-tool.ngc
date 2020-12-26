@@ -1,6 +1,9 @@
 (load-tool.ngc)
 O<load-tool> sub
 
+#<store_height> = #<_ini[ATC]STORE_HEIGHT>
+#<change_height> = #<_ini[ATC]CHANGE_HEIGHT>
+
 O100 if [#2001 NE 1]
     (abort, only use this call during a tool change)
     G04 P0.25
@@ -8,9 +11,9 @@ O100 endif
 
 M24
 G04 P0.25
-G53 G0 Z10 F100
+G53 G0 Z#<change_height> F100
 G04 P0.25
-G53 G0 Z-72.2 F100
+G53 G0 Z#<store_height> F100
 G04 P0.25
 M23
 G04 P0.5
