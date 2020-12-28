@@ -4,7 +4,7 @@ o<m10> sub
 #<current_pocket> = #[#<_ini[ATC]CURRENT_TOOL_POCKET>]
 #<pockets> = #<_ini[ATC]POCKETS>
 #<half_pocket> = [#<pockets>/2]
-O110 if [#5171 NE 1]
+O110 if [[#5171 NE 1] AND [#5171 NE -1]]
      M13
 O110 endif
 

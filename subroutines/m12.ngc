@@ -6,9 +6,8 @@ o<m12> sub
 #<pockets> = #<_ini[ATC]POCKETS>
 
 
-O100 if [#5171 NE 1]
-      (print, atc not homed, homing)
-      M13
+O100 if [[#5171 NE 1] AND [#5171 NE -1]]
+     M13
 O100 endif
 
 O110 if [EXISTS[#<p>]]
@@ -18,9 +17,10 @@ O110 else
     (tells the atc widget move 1 step reverse)
 O110 endif
 
-(tells the atc widget how many steps to move and start moving reverse)
-
-(DEBUG, EVAL[vcp.getWidget{"dynatc"}.rotate{#<Steps_to_move>, "cw"}])
+(tells the atc widget how many steps to move and start moving reverse but not if moving for homing)
+O115 if [#5171 NE -1] 
+   (DEBUG, EVAL[vcp.getWidget{"dynatc"}.rotate{#<Steps_to_move>, "cw"}])
+O115 endif
 
 M64 P5
 O120 do

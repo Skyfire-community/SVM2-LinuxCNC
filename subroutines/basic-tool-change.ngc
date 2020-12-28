@@ -4,6 +4,7 @@ o<basic-tool-change> sub
 #<tool_range_start> = [#<_ini[ATC]TOOL_RANGE_START> -1]
 #<pockets> = #<_ini[ATC]POCKETS>
 #<current_spindle_tool> = #[#<_ini[ATC]CURRENT_SPINDLE_TOOL>]
+#<change_height> = #<_ini[ATC]CHANGE_HEIGHT>
 
 O<init-tool-change> call ;Initialize the tool change (like setting flags and orienting spindl)
 G04 P0.25
@@ -53,18 +54,18 @@ O180 IF [#110 GT 0] ; checks if there is a valid tool in the spindle
 		(abort, carousel is full, cant put away tool in into carousel)
 	O190 endif
 
-	;M10 P[#<open_pocket>] ; move carousel to an open pocket
-    ;O<remove-tool> CALL
+	M10 P[#<open_pocket>] ; move carousel to an open pocket
+    O<remove-tool> CALL
     (DEBUG, EVAL[vcp.getWidget{"dynatc"}.store_tool{#<open_pocket>, #110}])
 	#[#<tool_range_start> +  #<open_pocket>] = #110 ; save tool number in pocket
 	#[#<_ini[ATC]CURRENT_SPINDLE_TOOL>] = 0 ; empty tool in the spindle
 O180 ENDIF
 
-G0 G53 Z0
+G0 G53 Z#<change_height>
 
 O200 IF [#100 GT 0] ; selected tool is not tool
-    ;M10 P#<next_pocket> ;set the carousel to move to the right pocket for the selected tool
-    ;O<load-tool> CALL
+    M10 P#<next_pocket> ;set the carousel to move to the right pocket for the selected tool
+    O<load-tool> CALL
     (DEBUG, EVAL[vcp.getWidget{"dynatc"}.store_tool{#<next_pocket>, 0}])
     #[#<tool_range_start> +  #<next_pocket>] = 0
     #[#<_ini[ATC]CURRENT_SPINDLE_TOOL>] = #100 ;Set persistent variable to remember tool in spindle after power cycle
