@@ -18,4 +18,4 @@
 #
 import remap
 import oword
-print "updated"
+print "toplevel loaded"

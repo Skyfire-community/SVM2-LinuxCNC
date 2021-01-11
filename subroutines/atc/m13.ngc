@@ -12,12 +12,8 @@ o<m13> sub
 
 (DEBUG, EVAL[vcp.getWidget{"dynatc"}.atc_message{}])
 
-#1 = 0
-o130 while [#1 LT [#<pockets>]]
-    #2 = #[#<tool_range_start> + #1]
-    #1 = [#1+1]
-    (DEBUG, EVAL[vcp.getWidget{"dynatc"}.store_tool{#1, #2}])
-o130 endwhile
+
+o<load_tool_changer_ui> call
 #5171=-1
 O140 IF [#<current_pocket> NE 1]
     M10 P1 

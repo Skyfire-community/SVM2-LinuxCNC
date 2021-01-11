@@ -1,0 +1,13 @@
+o<basic-tool-change> sub
+(print, Current Tool:    #<current_tool>)
+(print, Current Pocket:  #<current_pocket>)
+
+(print, Selected Tool:   #<selected_tool>)
+(print, Selected Pocket: #<selected_pocket>)
+
+(print, ****** ATC INFO ******)
+(print, Number of Pockets: #<atc_num_pockets>)
+(print, Open Pocket: #<atc_open_pocket>)
+
+o<basic-tool-change> endsub [1]
+M2

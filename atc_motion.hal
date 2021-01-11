@@ -55,3 +55,5 @@ net pocket-10 atc-widget.pocket-10 <= motion.analog-out-20
 net pocket-11 atc-widget.pocket-11 <= motion.analog-out-21
 net pocket-12 atc-widget.pocket-12 <= motion.analog-out-22
 
+net tool-prep-loop iocontrol.0.tool-prepare iocontrol.0.tool-prepared
+
