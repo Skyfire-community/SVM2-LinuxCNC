@@ -109,6 +109,7 @@ def _write_tool_table():
     """
 
     tool_table = _read_tool_table()
+
     lines = []
 
     # create the table header
@@ -156,6 +157,7 @@ def _write_tool_table():
     #     print line
 
     # write to file
+    print lines
     with open(TOOL_TABLE_FILE, 'w') as fh:
         fh.write('\n'.join(lines))
         fh.write('\n')  # new line at end of file

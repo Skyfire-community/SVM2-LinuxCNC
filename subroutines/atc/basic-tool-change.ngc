@@ -9,5 +9,79 @@ o<basic-tool-change> sub
 (print, Number of Pockets: #<atc_num_pockets>)
 (print, Open Pocket: #<atc_open_pocket>)
 
+; End if tool in spindle is same as requested
+O100 if [#<current_tool> EQ #<selected_tool>]
+ o<toolchange> endsub [1]
+M2
+O100 endif
+
+
+; Request manual removal if no pocket in ATC
+O110 if [#<atc_open_pocket> LT 0]
+ (print, No open pocket in the ATC, please remove manually.)
+ o<toolchange> endsub [1]
+M2
+O110 endif
+
+
+; checks if requested tool is in the ATC
+O11 if [#<selected_pocket> LT 0]
+ (abort, tool not in carousel)
+ o<toolchange> endsub [0]
+M2
+O11 endif
+
+o<init-tool-change> call
+
+;now we know which pocket the next tool is sitting in
+;we need to know if we need to put a tool away
+;or if there is no tool in the spindle
+
+; Check if there is a valid tool in the spindle
+O180 IF [#<current_tool> GT 0]
+
+    ; If there is a tool in the spindle, checks if there is an open pocket
+    O190 if [#<atc_open_pocket> EQ -1]
+        o<finalize-tool-change> call
+        (abort, carousel is full, can't store tool)
+    O190 endif
+
+    ; move carousel to open pocket
+    M10 P[#<atc_open_pocket>]
+
+    ; put current tool into open pocket
+    O<remove-tool> CALL
+    (DEBUG, EVAL[vcp.getWidget{"dynatc"}.store_tool{#<atc_open_pocket>, #<current_tool>}])
+
+    ; return where we stored the tool
+    #<stored_tool> = #<current_tool>
+    #<stored_pocket> = #<atc_open_pocket>
+
+    ; no tool in spindle
+    #<current_tool> = 0
+
+    #5231 = 0 ; no tool in spindle
+
+O180 ENDIF
+
+O200 IF [#<selected_tool> GT 0] ; selected tool is not tool 0
+    M10 P#<selected_pocket> ; move carousel to selected tool pocket
+    O<load-tool> CALL
+    (DEBUG, EVAL[vcp.getWidget{"dynatc"}.store_tool{#<selected_pocket>, 0}])
+    #5231 = #<selected_tool> ;Set persistent variable to remember tool in spindle after power cycle
+O200 Else ;emptying the spindle no tool.
+    M23
+    M22
+    #5231 = 0
+O200 ENDIF
+
+(print, selected tool, #<selected_tool>)
+(print, current tool, #<current_tool>)
+
+#<current_tool> = #<selected_tool>
+
+M61 Q#<selected_tool>
+
+
 o<basic-tool-change> endsub [1]
 M2
