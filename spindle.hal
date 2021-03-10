@@ -40,16 +40,16 @@ setp   hm2_7i76e.0.stepgen.05.maxvel           [SPINDLE_0]MAX_VELOCITY
 
 # ---Encoder feedback signals/setup---
 
-setp    hm2_7i76e.0.encoder.03.counter-mode 0
-setp    hm2_7i76e.0.encoder.03.filter 1
-setp    hm2_7i76e.0.encoder.03.index-invert 0
-setp    hm2_7i76e.0.encoder.03.index-mask 0
-setp    hm2_7i76e.0.encoder.03.index-mask-invert 0
-setp    hm2_7i76e.0.encoder.03.scale  [SPINDLE_0]ENCODER_SCALE
+setp    hm2_7i76e.0.encoder.06.counter-mode 0
+setp    hm2_7i76e.0.encoder.06.filter 1
+setp    hm2_7i76e.0.encoder.06.index-invert 0
+setp    hm2_7i76e.0.encoder.06.index-mask 0
+setp    hm2_7i76e.0.encoder.06.index-mask-invert 0
+setp    hm2_7i76e.0.encoder.06.scale  [SPINDLE_0]ENCODER_SCALE
 
-net spindle-revs             <=   hm2_7i76e.0.encoder.03.position
-net spindle-vel-fb-rps       <=   hm2_7i76e.0.encoder.03.velocity
-net spindle-index-enable     <=>  hm2_7i76e.0.encoder.03.index-enable
+net spindle-revs             <=   hm2_7i76e.0.encoder.06.position
+net spindle-vel-fb-rps       <=   hm2_7i76e.0.encoder.06.velocity
+net spindle-index-enable     <=>  hm2_7i76e.0.encoder.06.index-enable
 
 # ---setup spindle control signals---
 
