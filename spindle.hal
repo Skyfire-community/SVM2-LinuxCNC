@@ -25,6 +25,7 @@ net spindle-vel-fb-rpm      => pid.s.feedback
 net spindle-output        <=  pid.s.output
 
 # Step Gen signals/setup
+setp   hm2_7i76e.0.stepgen.05.direction.invert_output true 
 
 setp   hm2_7i76e.0.stepgen.05.dirsetup        [SPINDLE_0]DIRSETUP
 setp   hm2_7i76e.0.stepgen.05.dirhold         [SPINDLE_0]DIRHOLD
@@ -73,8 +74,8 @@ net spindle-vel-cmd-rpm-abs     <=  spindle.0.speed-out-abs
 
 
 # --- other spindle commanded details
-net spindle-cw                  <=  spindle.0.forward
-net spindle-ccw                 <=  spindle.0.reverse
+net spindle-cw                 <=  spindle.0.forward
+net spindle-ccw                  <=  spindle.0.reverse
 net spindle-brake               <=  spindle.0.brake
 net spindle-revs                =>  spindle.0.revs
 net spindle-vel-fb-rps          =>  spindle.0.speed-in
